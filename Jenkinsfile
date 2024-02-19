@@ -6,7 +6,7 @@ pipeline {
         maven "mymaven"
     }
     environment{
-        BUILD_SERVER=ec2-user@172.31.7.226
+        BUILD_SERVER='ec2-user@172.31.7.226'
     }
     stages {
         stage('Compile') {
