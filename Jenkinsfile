@@ -39,7 +39,7 @@ pipeline {
                     sshagent(['slave2']) {
                         echo "Packaging"
                         sh "scp -o StrictHostKeyChecking=no server-config.sh $BUILD_SERVER:/home/ec2-user"
-                        sh "ssh -o StrictHostKeyChecking=no $ BUILD_SERVER 'bash server-config.sh'"
+                        sh "ssh -o StrictHostKeyChecking=no $BUILD_SERVER 'bash server-config.sh'"
                     }
                 }
             }
