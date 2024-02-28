@@ -7,6 +7,7 @@ pipeline {
     }
     environment{
         BUILD_SERVER='ec2-user@172.31.2.221'
+        DEPLOY_SERVER='ec2-user@172.31.10.201'
         IMAGE_NAME='ereshre/java-mvn-privaterepo'
     }
     stages {
@@ -49,6 +50,22 @@ pipeline {
                     }
                 }
             }
+        }
+
+        stage('Deploy docker container') {
+            agent any
+            steps {
+                scripts {
+                    sshagent(['slave2']) {
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                            echo "Run the docker container"
+                            sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker"
+                            sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo systemctl start docker"
+                            sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                            sh "ssh ${DEPLOY_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
+                }
+            }
+
         }
     }
     
