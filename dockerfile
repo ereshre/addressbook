@@ -1,3 +1,4 @@
+# Stage1 : Build Stage
 FROM maven:3.8.4-openjdk-11-slim AS build-stage
 
 # Set the working directory inside the container

@@ -6,7 +6,8 @@ pipeline {
         maven "mymaven"
     }
     environment{
-        BUILD_SERVER='ec2-user@172.31.7.226'
+        BUILD_SERVER='ec2-user@172.31.2.221'
+        IMAGE_NAME='ereshre/java-mvn-privaterepo'
     }
     stages {
         stage('Compile') {
@@ -32,14 +33,19 @@ pipeline {
                 }
             }
         }
-        stage('Package') {
+        stage('Containerize+push the image to registry') {
             agent any
             steps {
                 script {
                     sshagent(['slave2']) {
-                        echo "Packaging"
-                        sh "scp -o StrictHostKeyChecking=no server-config.sh $BUILD_SERVER:/home/ec2-user"
-                        sh "ssh -o StrictHostKeyChecking=no $BUILD_SERVER 'bash server-config.sh'"
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                            // some block
+                        }
+                        echo "Containerise and push the image to registry"
+                        sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
+                        sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh' ${IMAGE_NAME} ${BUILD_NUMBER}"
+                        sh "ssh ${BUILD_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                        sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                     }
                 }
             }
