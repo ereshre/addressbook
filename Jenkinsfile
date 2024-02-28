@@ -55,7 +55,7 @@ pipeline {
         stage('Deploy docker container') {
             agent any
             steps {
-                scripts {
+                script {
                     sshagent(['slave2']) {
                         withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                             echo "Run the docker container"
