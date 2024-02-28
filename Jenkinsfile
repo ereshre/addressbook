@@ -20,7 +20,8 @@ pipeline {
             }
         }
         stage('Test') {
-            agent {label 'linux_slave'}
+            //agent {label 'linux_slave'}
+            agent any
             steps {
                 script {
                     echo "Executing TCs"
