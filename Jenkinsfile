@@ -34,19 +34,18 @@ pipeline {
                 }
             }
         }
-        stage('Containerize+push the image to registry') {
+        stage('Containerise+push the image to registry') {
             agent any
             steps {
                 script {
                     sshagent(['slave2']) {
                         withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                            // some block
+                            echo "Containerise and push the image to registry"
+                            sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
+                            sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh' ${IMAGE_NAME} ${BUILD_NUMBER}"
+                            sh "ssh ${BUILD_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                            sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                         }
-                        echo "Containerise and push the image to registry"
-                        sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
-                        sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh' ${IMAGE_NAME} ${BUILD_NUMBER}"
-                        sh "ssh ${BUILD_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
-                        sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                     }
                 }
             }
