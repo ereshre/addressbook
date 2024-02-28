@@ -63,6 +63,8 @@ pipeline {
                             sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo systemctl start docker"
                             sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
                             sh "ssh ${DEPLOY_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
+                        }
+                    }
                 }
             }
 
